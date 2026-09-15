@@ -1,0 +1,48 @@
+# This is a Declarative Automation Bundle definition for urbancart.
+# See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
+bundle:
+  name: urbancart
+  uuid: ddfe8202-bb17-4ad3-8e50-aa0a9b0ef5ff
+
+include:
+  - resources/*.yml
+
+# Variable declarations. These variables are assigned in the dev/prod targets below.
+variables:
+  catalog:
+    description: The catalog to use
+  schema:
+    description: The schema to use
+
+targets:
+  dev:
+    # The default target uses 'mode: development' to create a development copy.
+    # - Deployed resources get prefixed with '[dev my_user_name]'
+    # - Any job schedules and triggers are paused by default.
+    # See also https://docs.databricks.com/dev-tools/bundles/deployment-modes.html.
+    mode: development
+    default: true
+    workspace:
+      host: https://adb-7405616417595428.8.azuredatabricks.net
+  
+  test:
+    mode: production
+    workspace:
+      host: https://adb-7405607375689293.13.azuredatabricks.net/
+      # We explicitly deploy to /Workspace/Users/yogesh@trialwithdestinygmail.onmicrosoft.com to make sure we only have a single copy.
+      root_path: /Workspace/Shared/.bundle/${bundle.name}/${bundle.target}
+
+    permissions:
+      - user_name: yogesh@trialwithdestinygmail.onmicrosoft.com
+        level: CAN_MANAGE
+
+  prod:
+    mode: production
+    workspace:
+      host: https://adb-7405608182562693.13.azuredatabricks.net/
+      # We explicitly deploy to /Workspace/Users/yogesh@trialwithdestinygmail.onmicrosoft.com to make sure we only have a single copy.
+      root_path: /Workspace/Shared/.bundle/${bundle.name}/${bundle.target}
+
+    permissions:
+      - user_name: yogesh@trialwithdestinygmail.onmicrosoft.com
+        level: CAN_MANAGE
