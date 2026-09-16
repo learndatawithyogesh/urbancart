@@ -11,8 +11,7 @@ include:
 variables:
   catalog:
     description: The catalog to use
-  schema:
-    description: The schema to use
+    default: urbancart_dev
 
 targets:
   dev:
@@ -29,12 +28,18 @@ targets:
     mode: production
     workspace:
       host: https://adb-7405607375689293.13.azuredatabricks.net/
-      # We explicitly deploy to /Workspace/Users/yogesh@trialwithdestinygmail.onmicrosoft.com to make sure we only have a single copy.
+      # We explicitly deploy to /Workspace/Users/yogesh@trialwithdestinygmail.onmicrosoft.com  make sure we only have a single copy.
       root_path: /Workspace/Shared/.bundle/${bundle.name}/${bundle.target}
+    variables:
+      catalog:
+        default: urbancart_test
 
     permissions:
-      - user_name: yogesh@trialwithdestinygmail.onmicrosoft.com
+      - service_principal_name: 7bb31e78-f3e2-42cd-a2e0-4a08c050a540
         level: CAN_MANAGE
+    
+    run_as:
+      service_principal_name: 7bb31e78-f3e2-42cd-a2e0-4a08c050a540
 
   prod:
     mode: production
@@ -42,7 +47,13 @@ targets:
       host: https://adb-7405608182562693.13.azuredatabricks.net/
       # We explicitly deploy to /Workspace/Users/yogesh@trialwithdestinygmail.onmicrosoft.com to make sure we only have a single copy.
       root_path: /Workspace/Shared/.bundle/${bundle.name}/${bundle.target}
+    variables:
+      catalog:
+        default: urbancart_prod
 
     permissions:
-      - user_name: yogesh@trialwithdestinygmail.onmicrosoft.com
+      - service_principal_name: aff34d3c-ff0a-437f-806e-ca6bcabf903b
         level: CAN_MANAGE
+    
+    run_as:
+      service_principal_name: aff34d3c-ff0a-437f-806e-ca6bcabf903b

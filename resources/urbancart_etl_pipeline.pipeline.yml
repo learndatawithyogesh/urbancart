@@ -1,0 +1,13 @@
+resources:
+  pipelines:
+    pipeline_urbancart_etl_pipeline:
+      name: urbancart_etl_pipeline
+      configuration:
+        catalog_name: ${var.catalog}
+      libraries:
+        - glob:
+            include: ../src/sdp_transformations/**
+      schema: default
+      photon: true
+      catalog: ${var.catalog}
+      serverless: true
