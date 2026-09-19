@@ -1,0 +1,33 @@
+resources:
+  jobs:
+    urbancart_etl_job:
+      name: urbancart_etl_job
+      tasks:
+        - task_key: ingest_sales_data
+          notebook_task:
+            notebook_path: ../src/notebooks/1.ingest_sales_data.ipynb
+            source: WORKSPACE
+        - task_key: process_sales-data
+          depends_on:
+            - task_key: ingest_sales_data
+          notebook_task:
+            notebook_path: ../src/notebooks/2.process_sales_data.ipynb
+            source: WORKSPACE
+        - task_key: store_sales_summary
+          depends_on:
+            - task_key: process_sales-data
+          notebook_task:
+            notebook_path: ../src/notebooks/3.store_sales_summary.ipynb
+            source: WORKSPACE
+        - task_key: products_sales_summary
+          depends_on:
+            - task_key: process_sales-data
+          notebook_task:
+            notebook_path: ../src/notebooks/4.product_sales_summary.ipynb
+            source: WORKSPACE
+      queue:
+        enabled: true
+      parameters:
+        - name: catalog_name
+          default: ${var.catalog}
+      performance_target: PERFORMANCE_OPTIMIZED
