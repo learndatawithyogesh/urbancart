@@ -7,7 +7,8 @@ bundle:
 include:
   - resources/*.yml
 
-# Variable declarations. These variables are assigned in the dev/prod targets below.
+# Variable declarations.
+#This is a demo comment for testing ci cd workflows.
 variables:
   catalog:
     description: The catalog to use
