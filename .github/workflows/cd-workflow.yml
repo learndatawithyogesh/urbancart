@@ -1,0 +1,70 @@
+name: "CD Workflow"
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+
+  # ── Job 1: Deploy to TEST ─────────────────────────────────
+  deploy_test:
+    name: "Deploy to TEST"
+    runs-on: ubuntu-latest
+    environment: test
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Databricks CLI
+        uses: databricks/setup-cli@main
+
+      - name: Deploy to Test
+        run: databricks bundle deploy --target test
+        env:
+          DATABRICKS_HOST: ${{ secrets.HOST }}
+          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+
+      - name: TEST deployment complete
+        run: echo "✅ Bundle deployed to TEST successfully"
+
+
+  # ── Job 2: Manual Approval Gate ────────────────────────────
+  approval_gate:
+    name: "Manual Approval — Waiting for Prod sign-off"
+    runs-on: ubuntu-latest
+    needs: deploy_test
+    environment: prod
+
+    steps:
+      - name: Approval received
+        run: echo "✅ Manual approval granted — proceeding to Prod deployment"
+
+
+  # ── Job 3: Deploy to Prod ─────────────────────────────────
+  deploy_prod:
+    name: "Deploy to Prod"
+    runs-on: ubuntu-latest
+    needs: approval_gate
+    environment: prod
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Databricks CLI
+        uses: databricks/setup-cli@main
+
+      - name: Deploy to Prod
+        run: databricks bundle deploy --target prod
+        env:
+          DATABRICKS_HOST: ${{ secrets.HOST }}
+          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+
+      - name: Prod deployment complete
+        run: echo "✅ Bundle deployed to PROD successfully"
